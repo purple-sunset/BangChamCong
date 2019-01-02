@@ -16,5 +16,31 @@ namespace BangChamCong
         {
             InitializeComponent();
         }
+
+        private void btnOpenFile_Click(object sender, EventArgs e)
+        {
+            lbResult.Text = String.Empty;
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = fileDialog.FileName;
+                tbFilePath.Text = filePath;
+            }
+        }
+
+        private void btnProcess_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var filePath = tbFilePath.Text;
+                if (!string.IsNullOrWhiteSpace(filePath))
+                {
+                    Service.ProcessData(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                lbResult.Text = ex.Message;
+            }
+        }
     }
 }
