@@ -29,18 +29,25 @@ namespace BangChamCong
 
         private void btnProcess_Click(object sender, EventArgs e)
         {
-            try
-            {
+            //try
+            //{
+                lbResult.Text = String.Empty;
                 var filePath = tbFilePath.Text;
                 if (!string.IsNullOrWhiteSpace(filePath))
                 {
                     Service.ProcessData(filePath);
+                    lbResult.Text = "Đã xong";
                 }
-            }
-            catch (Exception ex)
-            {
-                lbResult.Text = ex.Message;
-            }
+                else
+                {
+                    lbResult.Text = "Chưa chọn file";
+                }
+            //}
+            //catch (Exception ex)
+            //{
+            //    lbResult.Text = ex.Message;
+            //    throw;
+            //}
         }
     }
 }

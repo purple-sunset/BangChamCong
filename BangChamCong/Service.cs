@@ -13,6 +13,7 @@ namespace BangChamCong
         private static int _currYear;
         private static int _currMonth;
         private static int _totalDay;
+
         public static void ProcessData(string filePath)
         {
             using (var package = new ExcelPackage(new FileInfo(filePath)))
@@ -20,14 +21,14 @@ namespace BangChamCong
                 ExcelWorksheets listSheets = package.Workbook.Worksheets;
 
                 // Tính thời gian vào ra
-                ExcelWorksheet inOutSheet = listSheets.First(x => x.Name.Equals(AppSettingConstant.InOutSheet));
+                ExcelWorksheet inOutSheet = listSheets.First(x => x.Name.Trim().ToLower().Equals(AppSettingConstant.InOutSheet));
                 Dictionary<string, List<InOutData>> inOutData = ProcessInOutData(inOutSheet);
                 _currYear = inOutData.First().Value.First().InTime.Month;
                 _currMonth = inOutData.First().Value.First().InTime.Month;
                 _totalDay = DateTime.DaysInMonth(_currYear, _currMonth);
 
                 // Ghi vào sheet BCC
-                ExcelWorksheet salarySheet = listSheets.First(x => x.Name.Equals(AppSettingConstant.SalarySheet));
+                ExcelWorksheet salarySheet = listSheets.First(x => x.Name.Trim().ToLower().Equals(AppSettingConstant.SalarySheet));
                 WriteSalaryInformation(salarySheet, inOutData);
 
                 // Save
@@ -43,12 +44,12 @@ namespace BangChamCong
             {
                 if (inOutDataRange.Any(x => x.StartRow <= row && x.EndRow >= row))
                 {
-                    string day = inOutSheet.Cells[$"B{row}"].Text;
-                    string employee = inOutSheet.Cells[$"D{row}"].Text.ToLower();
-                    string timeIn = inOutSheet.Cells[$"F{row}"].Text;
-                    string timeOut = inOutSheet.Cells[$"G{row}"].Text;
+                    string day = inOutSheet.Cells[$"B{row}"].GetDateString();
+                    string employee = inOutSheet.Cells[$"D{row}"].GetLowerString();
+                    string timeIn = inOutSheet.Cells[$"F{row}"].GetLowerString();
+                    string timeOut = inOutSheet.Cells[$"G{row}"].GetLowerString();
 
-                    if (!string.IsNullOrWhiteSpace(employee) && !string.IsNullOrWhiteSpace(day))
+                    if (!string.IsNullOrWhiteSpace(employee) && !string.IsNullOrWhiteSpace(day) && !string.IsNullOrWhiteSpace(timeIn) && !string.IsNullOrWhiteSpace(timeOut))
                     {
                         var inOutItem = CreateInOutData(employee, day, timeIn, timeOut);
                         if (result.ContainsKey(employee))
@@ -74,7 +75,7 @@ namespace BangChamCong
             var result = new List<Range>();
             for (var row = 1; row <= inOutSheet.Dimension.End.Row; row++)
             {
-                string value = inOutSheet.Cells[$"A{row}"].Text.ToLower();
+                string value = inOutSheet.Cells[$"A{row}"].GetLowerString();
                 if (AppSettingConstant.InOutStart.Contains(value))
                 {
                     var lastItem = result.LastOrDefault();
@@ -132,9 +133,9 @@ namespace BangChamCong
                     if (result.OutTime > normalAfternoonInTime)
                     {
                         result.OTHour += (normalMorningOutTime - result.InTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:hh:mm}-{normalMorningOutTime:hh:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:HH:mm}-{normalMorningOutTime:HH:mm}, ";
                         result.OTHour += (result.OutTime - normalAfternoonInTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {normalAfternoonInTime:hh:mm}-{result.OutTime:hh:mm}; ";
+                        result.Note += $"{normalAfternoonInTime:HH:mm}-{result.OutTime:HH:mm}; ";
                     }
                     // Chỉ làm buổi sáng
                     else
@@ -143,7 +144,7 @@ namespace BangChamCong
                             ? result.OutTime
                             : normalMorningOutTime;
                         result.OTHour += (outTime - result.InTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:hh:mm}-{outTime:hh:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:HH:mm}-{outTime:HH:mm}; ";
                     }
                 }
                 // Chỉ làm buổi chiều
@@ -151,7 +152,7 @@ namespace BangChamCong
                 {
                     DateTime inTime = result.InTime > normalAfternoonInTime ? result.InTime : normalAfternoonInTime;
                     result.OTHour += (result.OutTime - inTime).TotalHours;
-                    result.Note += $"ngày {result.InTime.Day:D2}: {inTime:hh:mm}-{result.OutTime:hh:mm}; ";
+                    result.Note += $"ngày {result.InTime.Day:D2}: {inTime:HH:mm}-{result.OutTime:HH:mm}; ";
                 }
             }
             // Ngày thường
@@ -191,12 +192,12 @@ namespace BangChamCong
                     else if (AppSettingConstant.InternList.Contains(employee))
                     {
                         //result.OTHour += (result.OutTime - normalOutTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:hh:mm}-{result.OutTime:hh:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:HH:mm}-{result.OutTime:HH:mm}; ";
                     }
                     else
                     {
                         result.OTHour += (result.OutTime - normalOutTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:hh:mm}-{result.OutTime:hh:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:HH:mm}-{result.OutTime:HH:mm}; ";
                     }
                 }
             }
@@ -208,7 +209,7 @@ namespace BangChamCong
         {
             for (var row = 1; row <= salarySheet.Dimension.End.Row; row++)
             {
-                string employee = salarySheet.Cells[row, AppSettingConstant.NameColumn].Text.ToLower();
+                string employee = salarySheet.Cells[row, AppSettingConstant.NameColumn].GetLowerString();
                 if (inOutData.ContainsKey(employee))
                 {
                     var data = inOutData[employee];
@@ -216,6 +217,11 @@ namespace BangChamCong
                     // Ghi ngày làm việc
                     for (var day = 1; day <= _totalDay; day++)
                     {
+                        var date = new DateTime(_currYear, _currMonth, day);
+                        if (date.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            continue;
+                        }
                         var dataItem = data.FirstOrDefault(x => x.InTime.Day == day);
                         var column = AppSettingConstant.StartDayColumn + day - 1;
 
@@ -223,24 +229,38 @@ namespace BangChamCong
                         if (dataItem != null)
                         {
                             salarySheet.Cells[row, column].Value = Math.Round(dataItem.WorkDay, 1, MidpointRounding.AwayFromZero);
-                            if (string.IsNullOrWhiteSpace(dataItem.Comment))
+                            if (!string.IsNullOrWhiteSpace(dataItem.Comment))
                             {
-                                salarySheet.Cells[row, column].Comment.Author = AppSettingConstant.Author;
-                                salarySheet.Cells[row, column].Comment.Text = dataItem.Comment;
+                                if (salarySheet.Cells[row, column].Comment != null)
+                                {
+                                    var oldComment = salarySheet.Cells[row, column].Comment.Text;
+                                    salarySheet.Comments.Remove(salarySheet.Cells[row, column].Comment);
+                                    var newComment = $"{oldComment}\n{dataItem.Comment}";
+                                    salarySheet.Cells[row, column].AddComment(newComment, AppSettingConstant.Author);
+                                }
+                                else
+                                {
+                                    salarySheet.Cells[row, column].AddComment(dataItem.Comment, AppSettingConstant.Author);
+                                }
                             }
                         }
                         // Không có dữ liệu
                         else
                         {
-                            var date = new DateTime(_currYear, _currMonth, day);
-                            if (date.DayOfWeek != DayOfWeek.Sunday)
+                            // Check không phải part time
+                            if (!AppSettingConstant.InternList.Contains(employee))
                             {
-                                // Check không phải part time
-                                if (!AppSettingConstant.InternList.Contains(employee))
+                                salarySheet.Cells[row, column].Value = 0;
+                                if (salarySheet.Cells[row, column].Comment != null)
                                 {
-                                    salarySheet.Cells[row, column].Value = 0;
-                                    salarySheet.Cells[row, column].Comment.Author = AppSettingConstant.Author;
-                                    salarySheet.Cells[row, column].Comment.Text = "Nghỉ có phép";
+                                    var oldComment = salarySheet.Cells[row, column].Comment.Text;
+                                    salarySheet.Comments.Remove(salarySheet.Cells[row, column].Comment);
+                                    var newComment = $"{oldComment}\nNghỉ có phép";
+                                    salarySheet.Cells[row, column].AddComment(newComment, AppSettingConstant.Author);
+                                }
+                                else
+                                {
+                                    salarySheet.Cells[row, column].AddComment("Nghỉ có phép", AppSettingConstant.Author);
                                 }
                             }
                         }
@@ -250,7 +270,8 @@ namespace BangChamCong
                     var otColumn = AppSettingConstant.StartDayColumn + _totalDay + 6;
                     var noteColumn = AppSettingConstant.StartDayColumn + _totalDay + 8;
 
-                    salarySheet.Cells[row, otColumn].Value = Math.Round(data.Sum(x => x.OTHour), 2, MidpointRounding.AwayFromZero);
+                    var totalOTHour = Math.Round(data.Sum(x => x.OTHour), 2, MidpointRounding.AwayFromZero);
+                    salarySheet.Cells[row, otColumn].Value = totalOTHour;
                     if (data.Any(x => string.IsNullOrWhiteSpace(x.Note)))
                     {
                         var note = new StringBuilder("Tăng ca ");
@@ -262,10 +283,55 @@ namespace BangChamCong
                             }
                         }
 
+                        note.Append($"Tổng: {totalOTHour}h.");
                         salarySheet.Cells[row, noteColumn].Value = note.ToString();
                     }
                 }
             }
         }
+
+        #region Extension Method
+
+        public static string GetDateString(this ExcelRangeBase cell)
+        {
+            var value = cell.Value;
+            if (value != null)
+            {
+                if (value is DateTime)
+                {
+                    return (value as DateTime?).Value.ToString("dd/MM/yyyy");
+                }
+                else
+                {
+                    return value as string;
+                }
+            }
+            else
+            {
+                return String.Empty;
+            }
+        }
+
+        public static string GetLowerString(this ExcelRangeBase cell)
+        {
+            var value = cell.Value;
+            if (value != null)
+            {
+                if (value is string)
+                {
+                    return (value as string).ToLower();
+                }
+                else
+                {
+                    return value.ToString().ToLower();
+                }
+            }
+            else
+            {
+                return String.Empty;
+            }
+        }
+
+        #endregion
     }
 }

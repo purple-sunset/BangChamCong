@@ -37,7 +37,6 @@
             // 
             // fileDialog
             // 
-            this.fileDialog.FileName = "fileDialog";
             this.fileDialog.Filter = "Excel Files|*.xlsx";
             this.fileDialog.Title = "Chọn file excel";
             // 
@@ -48,6 +47,8 @@
             this.tbFilePath.Name = "tbFilePath";
             this.tbFilePath.Size = new System.Drawing.Size(401, 30);
             this.tbFilePath.TabIndex = 0;
+            this.tbFilePath.Text = "C:\\Users\\Duc\\Downloads\\Microsoft.SkypeApp_kzf8qxf38zg5c!App\\All\\BCC tháng 12.2018" +
+    ".xlsx";
             // 
             // btnOpenFile
             // 
@@ -80,7 +81,7 @@
             this.lbResult.TabIndex = 3;
             this.lbResult.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // Form1
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -89,7 +90,7 @@
             this.Controls.Add(this.btnProcess);
             this.Controls.Add(this.btnOpenFile);
             this.Controls.Add(this.tbFilePath);
-            this.Name = "Form1";
+            this.Name = "MainWindow";
             this.Text = "Form1";
             this.ResumeLayout(false);
             this.PerformLayout();

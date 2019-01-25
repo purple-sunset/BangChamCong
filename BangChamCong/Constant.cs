@@ -11,9 +11,9 @@ namespace BangChamCong
     {
         public static readonly string Author = ConfigurationManager.AppSettings["Author"];
 
-        public static readonly string InOutSheet = ConfigurationManager.AppSettings["InOutSheet"];
-        public static readonly string EarlyLateSheet = ConfigurationManager.AppSettings["EarlyLateSheet"];
-        public static readonly string SalarySheet = ConfigurationManager.AppSettings["SalarySheet"];
+        public static readonly string InOutSheet = ConfigurationManager.AppSettings["InOutSheet"].ToLower();
+        public static readonly string EarlyLateSheet = ConfigurationManager.AppSettings["EarlyLateSheet"].ToLower();
+        public static readonly string SalarySheet = ConfigurationManager.AppSettings["SalarySheet"].ToLower();
         public static readonly int StartDayColumn = int.Parse(ConfigurationManager.AppSettings["StartDayColumn"]);
         public static readonly int NameColumn = int.Parse(ConfigurationManager.AppSettings["NameColumn"]);
 
@@ -27,13 +27,13 @@ namespace BangChamCong
         public static readonly int OTGapMinute = int.Parse(ConfigurationManager.AppSettings["OTGapMinute"]);
         
 
-        public static readonly string[] InOutStart = ConfigurationManager.AppSettings["InOutStart"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-        public static readonly string InOutEnd = ConfigurationManager.AppSettings["InOutEnd"];
+        public static readonly string[] InOutStart = ConfigurationManager.AppSettings["InOutStart"].ToLower().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+        public static readonly string InOutEnd = ConfigurationManager.AppSettings["InOutEnd"].ToLower();
 
-        public static readonly string[] ManageList = ConfigurationManager.AppSettings["ManagerList"]
+        public static readonly string[] ManageList = ConfigurationManager.AppSettings["ManagerList"].ToLower()
                                                                          .Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-        public static readonly string[] InternList = ConfigurationManager.AppSettings["InternList"]
+        public static readonly string[] InternList = ConfigurationManager.AppSettings["InternList"].ToLower()
                                                                          .Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
     }
 }
