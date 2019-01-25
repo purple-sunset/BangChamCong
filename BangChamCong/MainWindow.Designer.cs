@@ -47,8 +47,6 @@
             this.tbFilePath.Name = "tbFilePath";
             this.tbFilePath.Size = new System.Drawing.Size(401, 30);
             this.tbFilePath.TabIndex = 0;
-            this.tbFilePath.Text = "C:\\Users\\Duc\\Downloads\\Microsoft.SkypeApp_kzf8qxf38zg5c!App\\All\\BCC tháng 12.2018" +
-    ".xlsx";
             // 
             // btnOpenFile
             // 
