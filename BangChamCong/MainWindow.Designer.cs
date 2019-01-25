@@ -89,7 +89,7 @@
             this.Controls.Add(this.btnOpenFile);
             this.Controls.Add(this.tbFilePath);
             this.Name = "MainWindow";
-            this.Text = "Form1";
+            this.Text = "Bảng Chấm Công";
             this.ResumeLayout(false);
             this.PerformLayout();
 
