@@ -225,8 +225,24 @@ namespace BangChamCong
                         var dataItem = data.FirstOrDefault(x => x.InTime.Day == day);
                         var column = AppSettingConstant.StartDayColumn + day - 1;
 
+                        // Lỗi dữ liệu
+                        if (data.Count(x => x.InTime.Day == day) > 1)
+                        {
+                            salarySheet.Cells[row, column].Value = 0;
+                            if (salarySheet.Cells[row, column].Comment != null)
+                            {
+                                var oldComment = salarySheet.Cells[row, column].Comment.Text;
+                                salarySheet.Comments.Remove(salarySheet.Cells[row, column].Comment);
+                                var newComment = $"{oldComment}\nLỗi";
+                                salarySheet.Cells[row, column].AddComment(newComment, AppSettingConstant.Author);
+                            }
+                            else
+                            {
+                                salarySheet.Cells[row, column].AddComment("Lỗi", AppSettingConstant.Author);
+                            }
+                        }
                         // Có dữ liệu quẹt thẻ
-                        if (dataItem != null)
+                        else if (dataItem != null)
                         {
                             salarySheet.Cells[row, column].Value = Math.Round(dataItem.WorkDay, 1, MidpointRounding.AwayFromZero);
                             if (!string.IsNullOrWhiteSpace(dataItem.Comment))
