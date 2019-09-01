@@ -126,6 +126,7 @@ namespace BangChamCong
             // Chủ nhật
             if (result.IsOTDay)
             {
+                result.OutTime = NormalizeOTHour(result.OutTime);
                 // Đi làm vào buổi sáng
                 if (result.InTime < normalMorningOutTime)
                 {
@@ -133,9 +134,9 @@ namespace BangChamCong
                     if (result.OutTime > normalAfternoonInTime)
                     {
                         result.OTHour += (normalMorningOutTime - result.InTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:HH:mm}-{normalMorningOutTime:HH:mm}, ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:HH\\hmm}-{normalMorningOutTime:HH\\hmm}, ";
                         result.OTHour += (result.OutTime - normalAfternoonInTime).TotalHours;
-                        result.Note += $"{normalAfternoonInTime:HH:mm}-{result.OutTime:HH:mm}; ";
+                        result.Note += $"{normalAfternoonInTime:HH\\hmm}-{result.OutTime:HH\\hmm}; ";
                     }
                     // Chỉ làm buổi sáng
                     else
@@ -144,7 +145,7 @@ namespace BangChamCong
                             ? result.OutTime
                             : normalMorningOutTime;
                         result.OTHour += (outTime - result.InTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:HH:mm}-{outTime:HH:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {result.InTime:HH\\hmm}-{outTime:HH\\hmm}; ";
                     }
                 }
                 // Chỉ làm buổi chiều
@@ -152,7 +153,7 @@ namespace BangChamCong
                 {
                     DateTime inTime = result.InTime > normalAfternoonInTime ? result.InTime : normalAfternoonInTime;
                     result.OTHour += (result.OutTime - inTime).TotalHours;
-                    result.Note += $"ngày {result.InTime.Day:D2}: {inTime:HH:mm}-{result.OutTime:HH:mm}; ";
+                    result.Note += $"ngày {result.InTime.Day:D2}: {inTime:HH\\hmm}-{result.OutTime:HH\\hmm}; ";
                 }
             }
             // Ngày thường
@@ -182,8 +183,9 @@ namespace BangChamCong
                 }
 
                 // Tính thời gian OT
-                if (result.OutTime > normalOutTime.AddMinutes(AppSettingConstant.OTGapMinute))
+                if (NormalizeOTHour(result.OutTime) > normalOutTime.AddMinutes(AppSettingConstant.OTGapMinute))
                 {
+                    result.OutTime = NormalizeOTHour(result.OutTime);
                     // Quản lý
                     if (AppSettingConstant.ManageList.Contains(employee))
                     {
@@ -192,12 +194,12 @@ namespace BangChamCong
                     else if (AppSettingConstant.InternList.Contains(employee))
                     {
                         //result.OTHour += (result.OutTime - normalOutTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:HH:mm}-{result.OutTime:HH:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:HH\\hmm}-{result.OutTime:HH\\hmm}; ";
                     }
                     else
                     {
                         result.OTHour += (result.OutTime - normalOutTime).TotalHours;
-                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:HH:mm}-{result.OutTime:HH:mm}; ";
+                        result.Note += $"ngày {result.InTime.Day:D2}: {normalOutTime:HH\\hmm}-{result.OutTime:HH\\hmm}; ";
                     }
                 }
             }
@@ -283,8 +285,8 @@ namespace BangChamCong
                     }
 
                     // Ghi thông tin OT
-                    var otColumn = AppSettingConstant.StartDayColumn + _totalDay + 6;
-                    var noteColumn = AppSettingConstant.StartDayColumn + _totalDay + 8;
+                    var otColumn = AppSettingConstant.StartDayColumn + _totalDay + 8;
+                    var noteColumn = AppSettingConstant.StartDayColumn + _totalDay + 10;
 
                     var totalOTHour = Math.Round(data.Sum(x => x.OTHour), 2, MidpointRounding.AwayFromZero);
                     salarySheet.Cells[row, otColumn].Value = totalOTHour;
@@ -304,6 +306,14 @@ namespace BangChamCong
                     }
                 }
             }
+        }
+
+        public static DateTime NormalizeOTHour(DateTime outTime)
+        {
+            int minute = outTime.Minute;
+            int normalizeMinute = minute % AppSettingConstant.NormalizeOTMinute;
+            var newOutTime = outTime.AddMinutes(-normalizeMinute);
+            return newOutTime;
         }
 
         #region Extension Method

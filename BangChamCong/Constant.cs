@@ -25,7 +25,8 @@ namespace BangChamCong
         public static readonly int LateGapMinute = int.Parse(ConfigurationManager.AppSettings["LateGapMinute"]);
         public static readonly int EarlyGapMinute = int.Parse(ConfigurationManager.AppSettings["EarlyGapMinute"]);
         public static readonly int OTGapMinute = int.Parse(ConfigurationManager.AppSettings["OTGapMinute"]);
-        
+        public static readonly int NormalizeOTMinute = int.Parse(ConfigurationManager.AppSettings["NormalizeOTMinute"]);
+
 
         public static readonly string[] InOutStart = ConfigurationManager.AppSettings["InOutStart"].ToLower().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
         public static readonly string InOutEnd = ConfigurationManager.AppSettings["InOutEnd"].ToLower();
